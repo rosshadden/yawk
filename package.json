@@ -18,5 +18,15 @@
     "api"
   ],
   "author": "Ross Hadden",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.5.1",
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^10.5.2",
+    "tslint": "^5.10.0",
+    "typescript": "^2.9.2"
+  }
 }
