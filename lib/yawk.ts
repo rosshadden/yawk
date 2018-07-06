@@ -4,9 +4,10 @@ import * as koaBody from 'koa-bodyparser';
 
 export enum Method {
 	All = 'ALL',
-	Del = 'DEL',
 	Delete = 'DELETE',
 	Get = 'GET',
+	Head = 'HEAD',
+	Options = 'OPTIONS',
 	Patch = 'PATCH',
 	Post = 'POST',
 	Put = 'PUT',
