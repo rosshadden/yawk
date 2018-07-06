@@ -13,7 +13,7 @@ export enum Method {
 	Put = 'PUT',
 }
 
-export type Handler = (ctx: Koa.Context, next?: () => void) => any;
+export type Handler = (ctx: Koa.Context, next?: () => any) => any;
 export type Registrar<T> = (registrar: T) => any;
 
 export interface Route {
@@ -71,7 +71,10 @@ export default class Yawk {
 		path = route.path;
 
 		this.routes.push(route);
-		this.router[method.toLowerCase()](path, handler);
+		this.router[method.toLowerCase()](path, async (ctx, next) => {
+			const result = await handler(ctx, next);
+			if (typeof result !== 'undefined') ctx.body = result;
+		});
 	}
 
 	public start() {
