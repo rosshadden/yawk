@@ -17,6 +17,10 @@
     "router",
     "api"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosshadden/yawk.git"
+  },
   "author": "Ross Hadden",
   "license": "ISC",
   "dependencies": {

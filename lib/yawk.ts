@@ -30,6 +30,7 @@ interface RouteOptions {
 
 export interface YawkConfig {
 	port: number;
+	prefix: string;
 }
 
 export default class Yawk {
@@ -40,8 +41,7 @@ export default class Yawk {
 
 	constructor(private config: YawkConfig, ...registrars: Array<Registrar<Yawk>>) {
 		this.app = new Koa();
-		this.router = new KoaRouter({ prefix: '/api' });
-
+		this.router = new KoaRouter({ prefix: config.prefix });
 		this.routes = [];
 
 		this.init(registrars);
