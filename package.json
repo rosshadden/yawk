@@ -1,0 +1,22 @@
+{
+  "name": "yawk",
+  "version": "0.0.0",
+  "description": "Yet Another Wrapper for Koa",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc && [ -d ./dist/bin ] && chmod -f +x ./dist/bin/* || exit 0",
+    "clean": "rm -rf ./dist",
+    "lint": "tslint -t stylish './src/**/*.ts' || exit 0",
+    "lint:verbose": "tslint -t codeFrame './src/**/*.ts' || exit 0",
+    "postinstall": "npm run build",
+    "watch": "tsc -w"
+  },
+  "keywords": [
+    "koa",
+    "wrapper",
+    "router",
+    "api"
+  ],
+  "author": "Ross Hadden",
+  "license": "ISC"
+}

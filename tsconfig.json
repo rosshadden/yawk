@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"outDir": "dist",
+		"target": "es2017",
+		"pretty": true
+	},
+	"include": [
+		"./bin/**/*",
+		"./lib/**/*.ts",
+		"./src/**/*.ts"
+	]
+}
