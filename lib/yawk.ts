@@ -31,6 +31,7 @@ export interface Route {
 	description?: string;
 	handler: Handler;
 	schema?: Schema | Description;
+	responseSchema?: Schema | Description;
 }
 
 export default class Yawk {
@@ -79,6 +80,15 @@ export default class Yawk {
 			} catch (ex) {
 				return error(ctx, 500, ex);
 			}
+
+			// Validate response against response schema if present
+			if ('responseSchema' in route) {
+				try {
+					ctx.responseValidation = await joi.validate(ctx.body, route.responseSchema, { abortEarly: false });
+				} catch (ex) {
+					return error(ctx, 500, ex);
+				}
+			}
 		});
 	}
 
@@ -110,6 +120,7 @@ export default class Yawk {
 							.map((route) => {
 								route = { ...route };
 								if (route.schema) route.schema = joi.describe(route.schema as Schema);
+								if (route.responseSchema) route.responseSchema = joi.describe(route.responseSchema as Schema);
 								return route;
 							});
 					}
