@@ -17,6 +17,11 @@ export enum Method {
 export type Handler = (ctx: Koa.Context, next?: () => any) => any;
 export type Registrar<T> = (registrar: T) => any;
 
+export interface YawkConfig {
+	port?: number;
+	prefix?: string;
+}
+
 export interface Route {
 	path: string;
 	method?: Method;
@@ -26,25 +31,26 @@ export interface Route {
 	schema?: any;
 }
 
-export interface YawkConfig {
-	port: number;
-	prefix?: string;
-}
-
 export default class Yawk {
+	private static defaultConfig: Partial<YawkConfig> = {
+		port: 3000,
+	};
+
 	private static defaultRouteOptions: Partial<Route> = {
 		method: Method.Get,
 		private: false,
 	};
 
 	public app: Koa;
-	public routes: Array<Route>;
 
+	private config: YawkConfig;
 	private router: KoaRouter;
+	private routes: Array<Route>;
 
-	constructor(private config: YawkConfig, ...registrars: Array<Registrar<Yawk>>) {
+	constructor(config: YawkConfig = {}, ...registrars: Array<Registrar<Yawk>>) {
 		this.app = new Koa();
-		this.router = new KoaRouter({ prefix: config.prefix });
+		this.config = { ...Yawk.defaultConfig, ...config };
+		this.router = new KoaRouter({ prefix: this.config.prefix });
 		this.routes = [];
 
 		this.init(registrars);
