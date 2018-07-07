@@ -57,7 +57,7 @@ export default class Yawk {
 			// Validate against schema if present
 			if ('schema' in route) {
 				try {
-					await joi.validate(ctx.query, route.schema, { abortEarly: false });
+					ctx.validation = await joi.validate(ctx.query, route.schema, { abortEarly: false });
 				} catch (ex) {
 					ctx.status = 422;
 					return ctx.body = {
