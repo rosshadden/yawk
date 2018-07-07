@@ -30,6 +30,7 @@
     "koa-router": "^7.4.0"
   },
   "devDependencies": {
+    "@types/joi": "^13.3.0",
     "@types/node": "^10.5.2",
     "tslint": "^5.10.0",
     "typescript": "^2.9.2"

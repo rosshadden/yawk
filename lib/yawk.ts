@@ -2,6 +2,7 @@ import * as Koa from 'koa';
 import * as KoaRouter from 'koa-router';
 import * as joi from 'joi';
 import * as koaBody from 'koa-bodyparser';
+import { Description, Schema } from 'joi';
 
 export enum Method {
 	All = 'ALL',
@@ -29,7 +30,7 @@ export interface Route {
 	private?: boolean;
 	description?: string;
 	handler: Handler;
-	schema?: any;
+	schema?: Schema | Description;
 }
 
 export default class Yawk {
@@ -48,6 +49,7 @@ export default class Yawk {
 	private config: YawkConfig;
 	private router: KoaRouter;
 	private routes: Array<Route>;
+	private routesInfo: Array<Route>;
 
 	constructor(config: YawkConfig = {}, ...registrars: Array<Registrar<Yawk>>) {
 		this.app = new Koa();
@@ -106,13 +108,16 @@ export default class Yawk {
 				path: '/routes',
 				description: 'Route info.',
 				handler: () => {
-					return this.routes
-						.filter((route) => !route.private)
-						.map((route) => {
-							route = { ...route };
-							if (route.schema) route.schema = joi.describe(route.schema);
-							return route;
-						});
+					if (!this.routesInfo) {
+						this.routesInfo = this.routes
+							.filter((route) => !route.private)
+							.map((route) => {
+								route = { ...route };
+								if (route.schema) route.schema = joi.describe(route.schema as Schema);
+								return route;
+							});
+					}
+					return this.routesInfo;
 				},
 			});
 		}
