@@ -2,7 +2,7 @@ import * as Koa from 'koa';
 import * as KoaRouter from 'koa-router';
 import * as joi from 'joi';
 import * as koaBody from 'koa-bodyparser';
-import { Description, Schema } from 'joi';
+import { Description, Schema, ValidationError } from 'joi';
 
 export enum Method {
 	All = 'ALL',
@@ -69,20 +69,16 @@ export default class Yawk {
 				try {
 					ctx.validation = await joi.validate(ctx.query, route.schema, { abortEarly: false });
 				} catch (ex) {
-					ctx.status = 422;
-					return ctx.body = {
-						id: ex.name,
-						status: ctx.status,
-						message: ex.details.map(({ message }) => message).join('; '),
-						count: ex.details.length,
-						error: ex,
-						data: ex.details,
-					};
+					return error(ctx, 422, ex);
 				}
 			}
 
-			const result = await route.handler(ctx, next);
-			if (typeof result !== 'undefined') ctx.body = result;
+			try {
+				const result = await route.handler(ctx, next);
+				if (typeof result !== 'undefined') ctx.body = result;
+			} catch (ex) {
+				return error(ctx, 500, ex);
+			}
 		});
 	}
 
@@ -123,5 +119,24 @@ export default class Yawk {
 		}
 		this.app.use(this.router.routes());
 		this.app.use(this.router.allowedMethods());
+	}
+}
+
+function error(ctx: Koa.Context, status: number, err: Error | ValidationError) {
+	ctx.status = status;
+	ctx.body = {
+		name: err.name,
+		status,
+		message: err.message,
+		error: err.toString(),
+		// TODO: show only if flag passed, defaulted to false
+		stack: err.stack,
+	};
+
+	if ('details' in err) {
+		ctx.body.error = err;
+		ctx.body.message = err.details.map(({ message }) => message).join('; ');
+		ctx.body.count = err.details.length;
+		ctx.body.data = err.details;
 	}
 }
