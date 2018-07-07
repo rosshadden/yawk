@@ -20,6 +20,7 @@ export type Registrar<T> = (registrar: T) => any;
 export interface YawkConfig {
 	port?: number;
 	prefix?: string;
+	metaRoute?: boolean;
 }
 
 export interface Route {
@@ -34,6 +35,7 @@ export interface Route {
 export default class Yawk {
 	private static defaultConfig: Partial<YawkConfig> = {
 		port: 3000,
+		metaRoute: true,
 	};
 
 	private static defaultRouteOptions: Partial<Route> = {
@@ -98,7 +100,22 @@ export default class Yawk {
 		console.log('Initializing registrars...');
 		for (const registrar of registrars) registrar(this);
 
-		console.log('Initializing API...');
+		console.log('Initializing routes...');
+		if (this.config.metaRoute) {
+			this.register({
+				path: '/routes',
+				description: 'Route info.',
+				handler: () => {
+					return this.routes
+						.filter((route) => !route.private)
+						.map((route) => {
+							route = { ...route };
+							if (route.schema) route.schema = joi.describe(route.schema);
+							return route;
+						});
+				},
+			});
+		}
 		this.app.use(this.router.routes());
 		this.app.use(this.router.allowedMethods());
 	}
