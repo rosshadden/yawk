@@ -95,7 +95,7 @@ export default class Yawk {
 		console.log('Initializing server...');
 		this.app.use(koaBody());
 		this.app.use((ctx, next) => {
-			ctx.server = this;
+			(ctx as any).server = this;
 			return next();
 		});
 
