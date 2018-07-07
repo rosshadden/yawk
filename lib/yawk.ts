@@ -19,26 +19,21 @@ export type Registrar<T> = (registrar: T) => any;
 export interface Route {
 	path: string;
 	method: Method;
-	private?: boolean;
-	description?: string;
 	handler: Handler;
-}
-
-interface RouteOptions {
-	private?: boolean;
 	description?: string;
+	private?: boolean;
 }
 
 export interface YawkConfig {
 	port: number;
-	prefix: string;
+	prefix?: string;
 }
 
 export default class Yawk {
-	app: Koa;
-	router: KoaRouter;
-
+	public app: Koa;
 	public routes: Array<Route>;
+
+	private router: KoaRouter;
 
 	constructor(private config: YawkConfig, ...registrars: Array<Registrar<Yawk>>) {
 		this.app = new Koa();
@@ -48,31 +43,10 @@ export default class Yawk {
 		this.init(registrars);
 	}
 
-	public register(
-		path: Route | string,
-		method: Method = Method.Get,
-		handler: Handler = () => {},
-		options: RouteOptions = {}
-	) {
-		let route: Route;
-
-		if (typeof path === 'string') {
-			route = {
-				path,
-				handler,
-				method,
-				private: options.private,
-				description: options.description,
-			};
-		}
-
-		handler = route.handler;
-		method = route.method;
-		path = route.path;
-
+	public register(route: Route) {
 		this.routes.push(route);
-		this.router[method.toLowerCase()](path, async (ctx, next) => {
-			const result = await handler(ctx, next);
+		this.router[route.method.toLowerCase()](route.path, async (ctx, next) => {
+			const result = await route.handler(ctx, next);
 			if (typeof result !== 'undefined') ctx.body = result;
 		});
 	}
