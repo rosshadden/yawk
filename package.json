@@ -1,6 +1,6 @@
 {
   "name": "yawk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Yet Another Wrapper for Koa",
   "main": "dist/index.js",
   "scripts": {
@@ -24,6 +24,7 @@
   "author": "Ross Hadden",
   "license": "ISC",
   "dependencies": {
+    "joi": "^13.4.0",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0"

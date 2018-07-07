@@ -1,5 +1,6 @@
 import * as Koa from 'koa';
 import * as KoaRouter from 'koa-router';
+import * as joi from 'joi';
 import * as koaBody from 'koa-bodyparser';
 
 export enum Method {
@@ -22,6 +23,7 @@ export interface Route {
 	private?: boolean;
 	description?: string;
 	handler: Handler;
+	schema?: any;
 }
 
 export interface YawkConfig {
@@ -52,6 +54,23 @@ export default class Yawk {
 		const route: Route = { ...Yawk.defaultRouteOptions, ...params };
 		this.routes.push(route);
 		this.router[route.method.toLowerCase()](route.path, async (ctx, next) => {
+			// Validate against schema if present
+			if ('schema' in route) {
+				try {
+					await joi.validate(ctx.query, route.schema, { abortEarly: false });
+				} catch (ex) {
+					ctx.status = 422;
+					return ctx.body = {
+						id: ex.name,
+						status: ctx.status,
+						message: ex.details.map(({ message }) => message).join('; '),
+						count: ex.details.length,
+						error: ex,
+						data: ex.details,
+					};
+				}
+			}
+
 			const result = await route.handler(ctx, next);
 			if (typeof result !== 'undefined') ctx.body = result;
 		});
