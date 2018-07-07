@@ -18,10 +18,10 @@ export type Registrar<T> = (registrar: T) => any;
 
 export interface Route {
 	path: string;
-	method: Method;
-	handler: Handler;
-	description?: string;
+	method?: Method;
 	private?: boolean;
+	description?: string;
+	handler: Handler;
 }
 
 export interface YawkConfig {
@@ -30,6 +30,11 @@ export interface YawkConfig {
 }
 
 export default class Yawk {
+	private static defaultRouteOptions: Partial<Route> = {
+		method: Method.Get,
+		private: false,
+	};
+
 	public app: Koa;
 	public routes: Array<Route>;
 
@@ -43,7 +48,8 @@ export default class Yawk {
 		this.init(registrars);
 	}
 
-	public register(route: Route) {
+	public register(params: Route) {
+		const route: Route = { ...Yawk.defaultRouteOptions, ...params };
 		this.routes.push(route);
 		this.router[route.method.toLowerCase()](route.path, async (ctx, next) => {
 			const result = await route.handler(ctx, next);
