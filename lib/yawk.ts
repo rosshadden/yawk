@@ -21,6 +21,7 @@ export type Registrar<T> = (registrar: T) => any;
 export interface YawkConfig {
 	port?: number;
 	prefix?: string;
+	init?: boolean;
 	metaRoute?: boolean;
 }
 
@@ -37,6 +38,7 @@ export interface Route {
 export default class Yawk {
 	private static defaultConfig: Partial<YawkConfig> = {
 		port: 3000,
+		init: true,
 		metaRoute: true,
 	};
 
@@ -58,7 +60,38 @@ export default class Yawk {
 		this.router = new KoaRouter({ prefix: this.config.prefix });
 		this.routes = [];
 
-		this.init(registrars);
+		if (this.config.init) this.init(registrars);
+	}
+
+	public init(registrars: Array<Registrar<Yawk>> = []) {
+		console.log('Initializing Yawk...');
+		this.app.use(koaBody());
+
+		console.log('Initializing registrars...');
+		for (const registrar of registrars) registrar(this);
+
+		console.log('Initializing routes...');
+		if (this.config.metaRoute) {
+			this.register({
+				path: '/routes',
+				description: 'Route info.',
+				handler: () => {
+					if (!this.routesInfo) {
+						this.routesInfo = this.routes
+							.filter((route) => !route.private)
+							.map((route) => {
+								route = { ...route };
+								if (route.schema) route.schema = joi.describe(route.schema as Schema);
+								if (route.responseSchema) route.responseSchema = joi.describe(route.responseSchema as Schema);
+								return route;
+							});
+					}
+					return this.routesInfo;
+				},
+			});
+		}
+		this.app.use(this.router.routes());
+		this.app.use(this.router.allowedMethods());
 	}
 
 	public register(params: Route) {
@@ -95,41 +128,6 @@ export default class Yawk {
 	public start() {
 		console.log('Listening on port:', this.config.port);
 		this.app.listen(this.config.port);
-	}
-
-	private init(registrars: Array<Registrar<Yawk>>) {
-		console.log('Initializing server...');
-		this.app.use(koaBody());
-		this.app.use((ctx, next) => {
-			(ctx as any).server = this;
-			return next();
-		});
-
-		console.log('Initializing registrars...');
-		for (const registrar of registrars) registrar(this);
-
-		console.log('Initializing routes...');
-		if (this.config.metaRoute) {
-			this.register({
-				path: '/routes',
-				description: 'Route info.',
-				handler: () => {
-					if (!this.routesInfo) {
-						this.routesInfo = this.routes
-							.filter((route) => !route.private)
-							.map((route) => {
-								route = { ...route };
-								if (route.schema) route.schema = joi.describe(route.schema as Schema);
-								if (route.responseSchema) route.responseSchema = joi.describe(route.responseSchema as Schema);
-								return route;
-							});
-					}
-					return this.routesInfo;
-				},
-			});
-		}
-		this.app.use(this.router.routes());
-		this.app.use(this.router.allowedMethods());
 	}
 }
 
