@@ -2,7 +2,7 @@ import * as Koa from 'koa';
 import * as KoaRouter from 'koa-router';
 import * as joi from 'joi';
 import * as koaBody from 'koa-bodyparser';
-import { Description, Schema, ValidationError } from 'joi';
+import { Description, Schema, SchemaMap, ValidationError } from 'joi';
 
 export enum Method {
 	All = 'ALL',
@@ -31,9 +31,9 @@ export interface Route {
 	private?: boolean;
 	description?: string;
 	handler: Handler;
-	schema?: Schema;
+	schema?: Schema | SchemaMap;
 	schemaInfo?: Description;
-	responseSchema?: Schema;
+	responseSchema?: Schema | SchemaMap;
 	responseSchemaInfo?: Description;
 }
 
@@ -84,11 +84,11 @@ export default class Yawk {
 							.map((route) => {
 								route = { ...route };
 								if (route.schema) {
-									route.schemaInfo = joi.describe(route.schema);
+									route.schemaInfo = joi.describe(joi.compile(route.schema));
 									delete route.schema;
 								}
 								if (route.responseSchema) {
-									route.responseSchemaInfo = joi.describe(route.responseSchema);
+									route.responseSchemaInfo = joi.describe(joi.compile(route.responseSchema));
 									delete route.responseSchema;
 								}
 								return route;
