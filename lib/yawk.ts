@@ -31,8 +31,10 @@ export interface Route {
 	private?: boolean;
 	description?: string;
 	handler: Handler;
-	schema?: Schema | Description;
-	responseSchema?: Schema | Description;
+	schema?: Schema;
+	schemaInfo?: Description;
+	responseSchema?: Schema;
+	responseSchemaInfo?: Description;
 }
 
 export default class Yawk {
@@ -81,8 +83,14 @@ export default class Yawk {
 							.filter((route) => !route.private)
 							.map((route) => {
 								route = { ...route };
-								if (route.schema) route.schema = joi.describe(route.schema as Schema);
-								if (route.responseSchema) route.responseSchema = joi.describe(route.responseSchema as Schema);
+								if (route.schema) {
+									route.schemaInfo = joi.describe(route.schema);
+									delete route.schema;
+								}
+								if (route.responseSchema) {
+									route.responseSchemaInfo = joi.describe(route.responseSchema);
+									delete route.responseSchema;
+								}
 								return route;
 							});
 					}
