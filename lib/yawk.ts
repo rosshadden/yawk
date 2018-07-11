@@ -31,10 +31,10 @@ export interface Route {
 	private?: boolean;
 	description?: string;
 	handler: Handler;
-	schema?: Schema | SchemaMap;
-	schemaInfo?: Description;
-	responseSchema?: Schema | SchemaMap;
-	responseSchemaInfo?: Description;
+	inputSchema?: Schema | SchemaMap;
+	inputSchemaInfo?: Description;
+	outputSchema?: Schema | SchemaMap;
+	outputSchemaInfo?: Description;
 }
 
 export default class Yawk {
@@ -83,13 +83,13 @@ export default class Yawk {
 							.filter((route) => !route.private)
 							.map((route) => {
 								route = { ...route };
-								if (route.schema) {
-									route.schemaInfo = joi.describe(joi.compile(route.schema));
-									delete route.schema;
+								if (route.inputSchema) {
+									route.inputSchemaInfo = joi.describe(joi.compile(route.inputSchema));
+									delete route.inputSchema;
 								}
-								if (route.responseSchema) {
-									route.responseSchemaInfo = joi.describe(joi.compile(route.responseSchema));
-									delete route.responseSchema;
+								if (route.outputSchema) {
+									route.outputSchemaInfo = joi.describe(joi.compile(route.outputSchema));
+									delete route.outputSchema;
 								}
 								return route;
 							});
@@ -106,11 +106,11 @@ export default class Yawk {
 		const route: Route = { ...Yawk.defaultRouteOptions, ...params };
 		this.routes.push(route);
 		this.router[route.method.toLowerCase()](route.path, async (ctx, next) => {
-			// Validate against schema if present
-			if ('schema' in route) {
+			// Validate against input schema if present
+			if ('inputSchema' in route) {
 				try {
 					const params = ([ 'POST', 'PUT' ].includes(ctx.method)) ? ctx.body : ctx.query;
-					ctx.validation = await joi.validate(params, route.schema, { abortEarly: false });
+					ctx.validation = await joi.validate(params, route.inputSchema, { abortEarly: false });
 				} catch (ex) {
 					return error(ctx, 422, ex);
 				}
@@ -123,10 +123,10 @@ export default class Yawk {
 				return error(ctx, 500, ex);
 			}
 
-			// Validate response against response schema if present
-			if ('responseSchema' in route) {
+			// Validate response against output schema if present
+			if ('outputSchema' in route) {
 				try {
-					ctx.responseValidation = await joi.validate(ctx.body, route.responseSchema, { abortEarly: false });
+					ctx.responseValidation = await joi.validate(ctx.body, route.outputSchema, { abortEarly: false });
 				} catch (ex) {
 					return error(ctx, 500, ex);
 				}
