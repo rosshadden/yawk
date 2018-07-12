@@ -4,7 +4,7 @@ import * as joi from 'joi';
 import * as koaBody from 'koa-bodyparser';
 import { Description, Schema, SchemaMap, ValidationError } from 'joi';
 
-export enum Method {
+export const enum Method {
 	All = 'ALL',
 	Delete = 'DELETE',
 	Get = 'GET',
@@ -14,6 +14,7 @@ export enum Method {
 	Post = 'POST',
 	Put = 'PUT',
 }
+type MethodName = 'ALL' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT';
 
 export type Handler = (ctx: Koa.Context, next?: () => any) => any;
 export type Registrar<T> = (registrar: T) => any;
@@ -27,7 +28,7 @@ export interface YawkConfig {
 
 export interface Route {
 	path: string;
-	method?: Method;
+	method?: MethodName;
 	private?: boolean;
 	description?: string;
 	handler: Handler;
