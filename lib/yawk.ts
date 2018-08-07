@@ -16,7 +16,12 @@ export const enum Method {
 }
 type MethodName = 'ALL' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT';
 
-export type Handler = (ctx: Koa.Context, next?: () => any) => any;
+export interface Context extends Koa.Context {
+	validation?: any;
+	responseValidation?: any;
+}
+
+export type Handler = (ctx: Context, next?: () => any) => any;
 export type Registrar<T> = (registrar: T) => any;
 
 export interface YawkConfig {
@@ -106,7 +111,7 @@ export default class Yawk {
 	public register(params: Route) {
 		const route: Route = { ...Yawk.defaultRouteOptions, ...params };
 		this.routes.push(route);
-		this.router[route.method.toLowerCase()](route.path, async (ctx, next) => {
+		this.router[route.method.toLowerCase()](route.path, async (ctx: Context, next) => {
 			// Validate against input schema if present
 			if ('inputSchema' in route) {
 				try {
@@ -141,7 +146,7 @@ export default class Yawk {
 	}
 }
 
-function error(ctx: Koa.Context, status: number, err: Error | ValidationError) {
+function error(ctx: Context, status: number, err: Error | ValidationError) {
 	ctx.status = status;
 	ctx.body = {
 		name: err.name,
