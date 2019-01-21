@@ -112,11 +112,13 @@ export default class Yawk {
 		const route: Route = { ...Yawk.defaultRouteOptions, ...params };
 		this.routes.push(route);
 		this.router[route.method.toLowerCase()](route.path, async (ctx: Context, next) => {
+			// Combine query and body in one place
+			ctx.input = Object.assign({}, ctx.request.body, ctx.query);
+
 			// Validate against input schema if present
 			if ('inputSchema' in route) {
 				try {
-					const params = ([ 'POST', 'PUT' ].includes(ctx.method)) ? ctx.body : ctx.query;
-					ctx.validation = await joi.validate(params, route.inputSchema, { abortEarly: false });
+					ctx.validation = await joi.validate(ctx.input, route.inputSchema, { abortEarly: false });
 				} catch (ex) {
 					return error(ctx, 422, ex);
 				}
