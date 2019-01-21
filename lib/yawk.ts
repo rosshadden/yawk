@@ -17,8 +17,9 @@ export const enum Method {
 type MethodName = 'ALL' | 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT';
 
 export interface Context extends Koa.Context {
-	validation?: any;
+	input?: any;
 	responseValidation?: any;
+	validation?: any;
 }
 
 export type Handler = (ctx: Context, next?: () => any) => any;
@@ -82,6 +83,7 @@ export default class Yawk {
 		if (this.config.metaRoute) {
 			this.register({
 				path: '/routes',
+				method: Method.Options,
 				description: 'Route info.',
 				handler: () => {
 					if (!this.routesInfo) {
