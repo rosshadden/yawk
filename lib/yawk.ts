@@ -85,6 +85,7 @@ export default class Yawk {
 				path: '/routes',
 				method: Method.Options,
 				description: 'Route info.',
+				inputSchema: {},
 				handler: () => {
 					if (!this.routesInfo) {
 						this.routesInfo = this.routes
