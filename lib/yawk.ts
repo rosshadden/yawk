@@ -82,8 +82,8 @@ export default class Yawk {
 		console.log('Initializing routes...');
 		if (this.config.metaRoute) {
 			this.register({
-				path: '/routes',
-				method: Method.Options,
+				path: '/',
+				method: Method.Get,
 				description: 'Route info.',
 				inputSchema: {},
 				handler: () => {
