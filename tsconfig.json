@@ -1,5 +1,4 @@
 {
-	"declaration": true,
 	"compilerOptions": {
 		"outDir": "dist",
 		"module": "commonjs",
