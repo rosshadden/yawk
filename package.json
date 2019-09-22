@@ -1,6 +1,6 @@
 {
   "name": "yawk",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Yet Another Wrapper for Koa",
   "main": "dist/index.js",
   "scripts": {
@@ -37,5 +37,7 @@
     "@types/node": "^10.14.18",
     "tslint": "^5.20.0",
     "typescript": "^3.6.3"
-  }
+  },
+	"prepublish": "npm run build",
+	"types": "dist/index.d.ts"
 }
