@@ -3,6 +3,7 @@ import * as KoaRouter from 'koa-router';
 import * as joi from 'joi';
 import * as koaBody from 'koa-bodyparser';
 import { Description, Schema, SchemaMap, ValidationError } from 'joi';
+import docs from './docs';
 
 export const enum Method {
 	All = 'ALL',
@@ -26,10 +27,10 @@ export type Handler = (ctx: Context, next?: () => any) => any;
 export type Registrar<T> = (registrar: T) => any;
 
 export interface YawkConfig {
+	docs?: boolean;
+	init?: boolean;
 	port?: number;
 	prefix?: string;
-	init?: boolean;
-	metaRoute?: boolean;
 }
 
 export interface Route {
@@ -46,9 +47,9 @@ export interface Route {
 
 export default class Yawk {
 	private static defaultConfig: Partial<YawkConfig> = {
-		port: 3000,
+		docs: true,
 		init: true,
-		metaRoute: true,
+		port: 3000,
 	};
 
 	private static defaultRouteOptions: Partial<Route> = {
@@ -80,33 +81,7 @@ export default class Yawk {
 		for (const registrar of registrars) registrar(this);
 
 		console.log('Initializing routes...');
-		if (this.config.metaRoute) {
-			this.register({
-				path: '/',
-				method: Method.Get,
-				description: 'Route info.',
-				inputSchema: {},
-				handler: () => {
-					if (!this.routesInfo) {
-						this.routesInfo = this.routes
-							.filter((route) => !route.private)
-							.map((route) => {
-								route = { ...route };
-								if (route.inputSchema) {
-									route.inputSchemaInfo = joi.describe(joi.compile(route.inputSchema));
-									delete route.inputSchema;
-								}
-								if (route.outputSchema) {
-									route.outputSchemaInfo = joi.describe(joi.compile(route.outputSchema));
-									delete route.outputSchema;
-								}
-								return route;
-							});
-					}
-					return this.routesInfo;
-				},
-			});
-		}
+		if (this.config.docs) docs(this, this.routes);
 		this.app.use(this.router.routes());
 		this.app.use(this.router.allowedMethods());
 	}
