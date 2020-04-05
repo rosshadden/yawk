@@ -5,10 +5,9 @@ export default function(yawk: Yawk, routes: Array<Route>) {
 	let routesInfo: Array<object>;
 
 	yawk.register({
-		path: '/docs',
+		path: '/.well-known/routes.json',
 		method: Method.Get,
 		description: 'Route info.',
-		inputSchema: {},
 		handler: () => {
 			if (!routesInfo) {
 				routesInfo = routes
@@ -17,12 +16,10 @@ export default function(yawk: Yawk, routes: Array<Route>) {
 						route = { ...route };
 						delete route.private;
 						if (route.inputSchema) {
-							route.inputSchemaInfo = joi.describe(joi.compile(route.inputSchema));
-							delete route.inputSchema;
+							route.inputSchema = joi.describe(joi.compile(route.inputSchema));
 						}
 						if (route.outputSchema) {
-							route.outputSchemaInfo = joi.describe(joi.compile(route.outputSchema));
-							delete route.outputSchema;
+							route.outputSchema = joi.describe(joi.compile(route.outputSchema));
 						}
 						return route;
 					});
