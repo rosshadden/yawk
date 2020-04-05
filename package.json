@@ -24,18 +24,18 @@
   "author": "Ross Hadden",
   "license": "ISC",
   "dependencies": {
-    "joi": "^13.7.0",
+    "joi": "^14.3.1",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.3.0",
-    "koa-router": "^7.4.0"
+    "koa-router": "^8.0.8"
   },
   "devDependencies": {
-    "@types/joi": "^13.6.3",
+    "@types/joi": "^14.3.4",
     "@types/koa": "^2.11.3",
     "@types/koa-bodyparser": "^4.3.0",
     "@types/koa-router": "^7.4.0",
-    "@types/node": "^10.17.18",
-    "tslint": "^5.20.1",
+    "@types/node": "^13.11.0",
+    "tslint": "^6.1.1",
     "typescript": "^3.8.3"
   },
   "types": "dist/index.d.ts"
