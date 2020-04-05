@@ -15,6 +15,7 @@ export default function(yawk: Yawk, routes: Array<Route>) {
 					.filter((route) => !route.private)
 					.map((route) => {
 						route = { ...route };
+						delete route.private;
 						if (route.inputSchema) {
 							route.inputSchemaInfo = joi.describe(joi.compile(route.inputSchema));
 							delete route.inputSchema;
