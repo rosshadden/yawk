@@ -5,7 +5,7 @@ export default function(yawk: Yawk, routes: Array<Route>) {
 	let routesInfo: Array<object>;
 
 	yawk.register({
-		path: '/.well-known/routes.json',
+		path: '/.well-known/routes',
 		method: Method.Get,
 		description: 'Route info.',
 		handler: () => {
