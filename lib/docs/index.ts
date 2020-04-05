@@ -5,7 +5,7 @@ export default function(yawk: Yawk, routes: Array<Route>) {
 	let routesInfo: Array<object>;
 
 	yawk.register({
-		path: '/',
+		path: '/docs',
 		method: Method.Get,
 		description: 'Route info.',
 		inputSchema: {},
